@@ -18,7 +18,7 @@ July 2020
 class Leg3D
 {
 public:
-    Leg3D(int side, int servozero_h, int servozero_f, int servozero_t, int servonum_h, int servonum_f, int servonum_t);
+    Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t);
     void update(float xrel, float yrel, float zrel);
     float lf;
     float lt;

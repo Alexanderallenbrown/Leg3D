@@ -8,13 +8,13 @@
 #include "Leg3D.h"
 #include <math.h>
 
-Leg3D::Leg3D(int side, int servozero_h, int servozero_f, int servozero_t, int servonum_h, int servonum_f, int servonum_t)
+Leg3D::Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
 {
   _side = side;
-  _servozero_h = servozero_h;
-  _servozero_f = servozero_f;
-  _servozero_t = servozero_t;
-  _servonum_h = servonum_h;
+  _servozero_h = servozero_h*PI/180;
+  _servozero_f = servozero_f*PI/180;
+  _servozero_t = servozero_t*PI/180;
+  _servonum_h = servonum_h*PI/180;
   _servonum_f = servonum_f;
   _servonum_t = servonum_t;
   USMIN = 600;
