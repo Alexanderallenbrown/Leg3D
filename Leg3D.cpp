@@ -14,7 +14,7 @@ Leg3D::Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, 
   _servozero_h = servozero_h*PI/180;
   _servozero_f = servozero_f*PI/180;
   _servozero_t = servozero_t*PI/180;
-  _servonum_h = servonum_h*PI/180;
+  _servonum_h = servonum_h;
   _servonum_f = servonum_f;
   _servonum_t = servonum_t;
   USMIN = 600;
@@ -95,7 +95,7 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
     _tht = _tht;
     _thf = 3.141592654 - _thf;
   }
-  
+
 }
 
 
