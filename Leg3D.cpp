@@ -11,16 +11,16 @@
 Leg3D::Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
 {
   _side = side;
-  _servozero_h = servozero_h*PI/180;
-  _servozero_f = servozero_f*PI/180;
-  _servozero_t = servozero_t*PI/180;
+  _servozero_h = servozero_h*3.14/180;
+  _servozero_f = servozero_f*3.14/180;
+  _servozero_t = servozero_t*3.14/180;
   _servonum_h = servonum_h;
   _servonum_f = servonum_f;
   _servonum_t = servonum_t;
   USMIN = 600;
   USMAX = 2400;
   SERVO_FREQ = 50;
-  _pwm = Adafruit_PWMServoDriver();
+  // _pwm = Adafruit_PWMServoDriver();
   lf = .044;
   lt = .071;
   tht_offset = 1.34;
@@ -28,11 +28,20 @@ Leg3D::Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, 
   zerox = .0065278;
   zeroz = -.091;
 
+   // _pwm.begin();
+   // _pwm.setOscillatorFrequency(27000000);
+   // _pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
+   // delay(10);
+
+
+}
+
+void Leg3D::attach(){
+  // _pwm = Adafruit_PWMServoDriver();
   _pwm.begin();
   _pwm.setOscillatorFrequency(27000000);
   _pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
-
-
+  delay(10);
 }
 
 void Leg3D::rawAngles(float xrel, float yrel, float zrel)
@@ -100,10 +109,17 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
 
 
 void Leg3D::writeServos(){
+
   //convert angles (in radians) to microseconds for writing
-  int16_t us_h = (USMAX-USMIN)/3.1415*_thh+USMIN;
-  int16_t us_f = (USMAX-USMIN)/3.1415*_thf+USMIN;
-  int16_t us_t = (USMAX-USMIN)/3.1415*_tht+USMIN;
+  uint16_t us_h = (USMAX-USMIN)/3.1415*_thh+USMIN;
+  uint16_t us_f = (USMAX-USMIN)/3.1415*_thf+USMIN;
+  uint16_t us_t = (USMAX-USMIN)/3.1415*_tht+USMIN;
+
+  // Serial.print(us_h);
+  // Serial.print("\t");
+  // Serial.print(us_f);
+  // Serial.print("\t");
+  // Serial.println(us_t);
   //write to servo driver
   _pwm.writeMicroseconds(_servonum_h, us_h);
   _pwm.writeMicroseconds(_servonum_f, us_f);
