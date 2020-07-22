@@ -70,7 +70,7 @@ void Leg3D::rawAngles(float xrel, float yrel, float zrel)
     opthd = 1*opthd/abs(opthd);
   }
   float thd = acos(opthd);
-  _tht_raw = 3.1415922654-thd;
+  _tht_raw = 3.141592654-thd;
 
 }
 
