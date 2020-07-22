@@ -20,6 +20,7 @@ class Leg3D
 public:
     Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t);
     void update(float xrel, float yrel, float zrel);
+    void attach();
     float lf;
     float lt;
     float tht_offset;
@@ -31,7 +32,7 @@ private:
     void servoAngles(float xrel, float yrel, float zrel);
     void rawAngles(float xrel, float yrel, float zrel);
     void writeServos();
-    Adafruit_PWMServoDriver _pwm;
+    Adafruit_PWMServoDriver _pwm;// = Adafruit_PWMServoDriver(0x40);
     int _side;
     float _servozero_h;
     float _servozero_f;
