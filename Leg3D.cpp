@@ -8,9 +8,10 @@
 #include "Leg3D.h"
 #include <math.h>
 
-Leg3D::Leg3D(int side, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
+Leg3D::Leg3D(int side, int diagonal, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
 {
   _side = side;
+  _diagonal = diagonal;
   _servozero_h = servozero_h*3.14/180;
   _servozero_f = servozero_f*3.14/180;
   _servozero_t = servozero_t*3.14/180;
@@ -61,25 +62,29 @@ void Leg3D::rawAngles(float xrel, float yrel, float zrel)
     }
   }
   //inverse kin calculations with intermediate vars
-  float zp = z/(cos(_thh_raw));
-  float d = sqrt(pow(zp,2)+pow(x,2));
-  float thleg = atan2(zp,x);
+  float zp = z/(cos(_thh_raw));  // displacement in z on the x-z plane (accounts for hip angle)
+  float d = sqrt(pow(zp,2)+pow(x,2));  // distance between foot and femur joint
+  float thleg = atan2(zp,x);  // angle between x-axis and line from femur joint to foot (should be negative when foot is below the chassis)
   float opthlt = (pow(d,2)+pow(lf,2) - pow(lt,2))/(2*d*lf);
   //if opthlt is >1, it can't be used with acos.
   //if this happens, it means we're out of the workspace.
   //to avoid runtime problems, just go as far as we can by setting the cos to +/- 1
   if(abs(opthlt)>=1){
+    // If the quantity's magnitude is larger than 1, it can't be evaluted
+    // by arccos. Assigns it a value of 1 or -1
     opthlt = 1.0*opthlt/abs(opthlt);
   }
-  float thlt = acos(opthlt);
-  _thf_raw = abs(thleg-thlt);
+  float thlt = acos(opthlt);   // angle between femur and line from femur joint to foot
+  _thf_raw = abs(thleg-thlt);  // angle of femur from x-axis (should be negative)
 
   float opthd = (pow(lt,2)+pow(lf,2)-pow(d,2))/(2*lt*lf);
   if(abs(opthd)>=1){
+    // If the quantity's magnitude is larger than 1, it can't be evaluted
+    // by arccos. Assigns it a value of 1 or -1
     opthd = 1*opthd/abs(opthd);
   }
-  float thd = acos(opthd);
-  _tht_raw = 3.141592654-thd;
+  float thd = acos(opthd);  // angle between femur and tibia
+  _tht_raw = 3.141592654-thd;  // supplementary angle
 
 }
 
@@ -95,12 +100,12 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
 
   // Adjust for your robot
   if(_servonum_h == 2) {
-      _thh = _thh - 2*3.141592654/180;
+      _thh = _thh + 2*3.141592654/180;
       _thf = _thf + 2*3.141592654/180;
       _tht = _tht - 11*3.141592654/180;
   }
   else if(_servonum_h == 5) {
-      _thh = _thh + 10*3.141592654/180;
+      _thh = _thh - 8*3.141592654/180;
       _thf = _thf + 3*3.141592654/180;
       _tht = _tht - 2*3.141592654/180;
   }
@@ -115,21 +120,30 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
       _tht = _tht - 8*3.141592654/180;
   }
 
-  // Adjust angle according to the servo's orientation
+  // Adjust angles according to the servo's orientation
   if(_side==2){
-    //servo is on the left side
+    //servo is on the left side (inboard) or right (outboard)
     _thf = _thf;
     _tht = 3.141592654 - _tht;
 
-    _thh = 3.141592654 - _thh;
+    // _thh = 3.141592654 - _thh;
   }
   else{
-    // servo is on the right side
-    _tht = _tht;
+    // servo is on the right side (inboard) or left (outboard)
+    // _tht = _tht;
     _thf = 3.141592654 - _thf;
     _thh = _thh;
   }
 
+  // Adjust hip angles according to the servo's orientation
+  if(_diagonal == 2) {
+    // FR and RL hips
+    _thh = 3.141592654 - _thh;
+  }
+  else {
+    // FL and RR hips
+    _tht = _tht;
+  }
 }
 
 
