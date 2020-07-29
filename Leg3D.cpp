@@ -75,7 +75,7 @@ void Leg3D::rawAngles(float xrel, float yrel, float zrel)
   _thf_raw = abs(thleg-thlt);
 
   float opthd = (pow(lt,2)+pow(lf,2)-pow(d,2))/(2*lt*lf);
-  if(abs(opthd)>1){
+  if(abs(opthd)>=1){
     opthd = 1*opthd/abs(opthd);
   }
   float thd = acos(opthd);
@@ -93,16 +93,41 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
   _tht = _tht_raw + off_tibia;
   _thh = _thh_raw + _servozero_h;
 
+  // Adjust for your robot
+  if(_servonum_h == 2) {
+      _thh = _thh - 2*3.141592654/180;
+      _thf = _thf + 2*3.141592654/180;
+      _tht = _tht - 11*3.141592654/180;
+  }
+  else if(_servonum_h == 5) {
+      _thh = _thh + 10*3.141592654/180;
+      _thf = _thf + 3*3.141592654/180;
+      _tht = _tht - 2*3.141592654/180;
+  }
+  else if(_servonum_h == 8){
+      _thh = _thh + 1*3.141592654/180; // consider increasing adjustment
+      _thf = _thf + 7*3.141592654/180;
+      _tht = _tht - 13*3.141592654/180;
+  }
+  else {
+      _thh = _thh + 10*3.141592654/180;
+      _thf = _thf + 10*3.141592654/180;
+      _tht = _tht - 8*3.141592654/180;
+  }
+
+  // Adjust angle according to the servo's orientation
   if(_side==2){
     //servo is on the left side
     _thf = _thf;
     _tht = 3.141592654 - _tht;
+
     _thh = 3.141592654 - _thh;
   }
   else{
     // servo is on the right side
     _tht = _tht;
     _thf = 3.141592654 - _thf;
+    _thh = _thh;
   }
 
 }
