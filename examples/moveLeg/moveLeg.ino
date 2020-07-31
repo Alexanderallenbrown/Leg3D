@@ -7,9 +7,12 @@ float freq = 6;
 
 
 //set up for the Right Front leg:
-//function prototype is Leg3d(side, diagonal, hip_center, femur_center, tibia_center, hip_num, femur_num, tibia_num)
-//side is 2 for left, 1 for right
-Leg3D leg = Leg3D(1, 1, 90,90,90,2,1,0);
+//function prototype is Leg3d(side, diagonal, face, hip_center, femur_center, tibia_center, hip_num, femur_num, tibia_num)
+// For inboard leg setup: left - side 2, and right - side 1
+// For outboard leg setup: left - side 1, and right - side 2
+// For both set-ups: FL and RR hips - diagonal 1, and FR and RL hips - diagonal 2
+// For both set-ups: front - face 1, and rear - face 2
+Leg3D leg = Leg3D(1, 1, 1, 90,90,90,2,1,0);
 
 void setup(){
     Serial.begin(115200);

@@ -7,10 +7,18 @@
 #include "Arduino.h"
 #include "Leg3D.h"
 #include <math.h>
+// #include <iostream>
+// using namespace std;
 
-Leg3D::Leg3D(int side, int diagonal, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
+Leg3D::Leg3D(int side, int diagonal, int face, float servozero_h, float servozero_f, float servozero_t, int servonum_h, int servonum_f, int servonum_t)
 {
+  // Conventions:
+  // For inboard leg setup: left - side 2, and right - side 1
+  // For outboard leg setup: left - side 1, and right - side 2
+  // For both set-ups: FL and RR hips - diagonal 1, and FR and RL hips - diagonal 2
+  // For both set-ups: front - face 1, and rear - face 2
   _side = side;
+  _face = face;
   _diagonal = diagonal;
   _servozero_h = servozero_h*3.14/180;
   _servozero_f = servozero_f*3.14/180;
@@ -26,8 +34,14 @@ Leg3D::Leg3D(int side, int diagonal, float servozero_h, float servozero_f, float
   lt = .071;
   tht_offset = 1.34;
   thf_offset = 2.36;
-  zerox = .0065278;
-  zeroz = -.091;
+  // zerox = .0065278;
+  // zeroz = -.091;
+  // front leg home position
+  zeroxf = .0065278;
+  zerozf = -0.085; //-.091;
+  // rear leg home position
+  zeroxr = -0.001; //.0065278;
+  zerozr = -0.091;//-.091;
 
    // _pwm.begin();
    // _pwm.setOscillatorFrequency(27000000);
@@ -47,8 +61,49 @@ void Leg3D::attach(){
 
 void Leg3D::rawAngles(float xrel, float yrel, float zrel)
 {
-  float x = xrel+zerox;
-  float z = zrel+zeroz;
+  // float x = xrel+zerox;
+  // float z = zrel+zeroz;
+
+  float x;
+  float z;
+  if(_face == 1) {
+    // Front legs
+    x = xrel+zeroxf;
+    z = zrel+zerozf;
+  }
+  else {
+    // Rear legs
+    x = xrel+zeroxr;
+    z = zrel+zerozr;
+  }
+
+  // TODO: figure out how to apply workspace or angle limits
+  // Check coordinates to ensure they are within the workspace
+  // if(x > 0.1016) {
+  //   cout << "WARN: x is outside of workspace (too big) \n";
+  //   x = 0.1016;
+  // }
+  // else if(x < -0.12) {
+  //   cout << "WARN: x is outside of workspace (too small) \n";
+  //   x = -0.12;
+  // }
+  // if(y > 0.15) {
+  //   cout << "WARN: y is outside of workspace (too big) \n";
+  //   y = 0.15;
+  // }
+  // else if(y < - 0.0707) {
+  //   cout << "WARN: y is outside of workspace (too small) \n";
+  //   y = -0.0707;
+  // }
+  // if(z > 0.135) {
+  //   cout << "WARN: z is outside of workspace (too big) \n";
+  //   z = 0.135;
+  // }
+  // else if(z < -0.153) {
+  //   cout << "WARN: z is outside of workspace (too small) \n";
+  //   z = -0.153;
+  // }
+
   //find hip angle, correcting for zeros
   if(z!=0){
     _thh_raw = atan(yrel/z);
@@ -111,7 +166,7 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
   }
   else if(_servonum_h == 8){
       _thh = _thh + 1*3.141592654/180; // consider increasing adjustment
-      _thf = _thf + 7*3.141592654/180;
+      _thf = _thf - 6*3.141592654/180;
       _tht = _tht - 13*3.141592654/180;
   }
   else {
@@ -119,6 +174,28 @@ void Leg3D::servoAngles(float xrel, float yrel, float zrel)
       _thf = _thf + 10*3.141592654/180;
       _tht = _tht - 8*3.141592654/180;
   }
+
+  // TODO: figure out how to apply workspace or angle limits
+  // Limit angles to prevent leg collisions
+  // if(_thh > 150) {
+  //     _thh = 150;
+  // }
+  // else if(_thh < 30) {
+  //     _thh = 30;
+  // }
+  // if(_thf > 170) {
+  //     _tht = 170;
+  // }
+  // else if(_thf < 10) {
+  //     _tht = 10;
+  // }
+  // if(_tht > 150) {
+  //     _tht = 150;
+  // }
+  // else if(_tht < 30) {
+  //     _tht = 30;
+  // }
+
 
   // Adjust angles according to the servo's orientation
   if(_side==2){
